@@ -5,6 +5,14 @@ export interface ModelCallResult {
   raw: unknown;
 }
 
+const MAX_RESPONSE_WORDS = 300;
+
+function truncateToWordLimit(text: string, maxWords: number): string {
+  const words = text.trim().split(/\s+/);
+  if (words.length <= maxWords) return text;
+  return `${words.slice(0, maxWords).join(' ')}…`;
+}
+
 export async function callModel(
   modelConfig: ModelConfig,
   systemPrompt: string,
@@ -53,10 +61,10 @@ async function callOpenAiCompatible(
   }
 
   const raw = await response.json();
-  const content = (raw as any)?.choices?.[0]?.message?.content;
-  if (typeof content !== 'string') {
+  const rawContent = (raw as any)?.choices?.[0]?.message?.content;
+  if (typeof rawContent !== 'string') {
     throw new Error(`Unexpected response shape from model: ${JSON.stringify(raw)}`);
   }
 
-  return { content, raw };
+  return { content: truncateToWordLimit(rawContent, MAX_RESPONSE_WORDS), raw };
 }

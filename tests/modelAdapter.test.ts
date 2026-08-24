@@ -94,6 +94,38 @@ describe('callModel', () => {
     ).rejects.toThrow(/502/);
   });
 
+  it('truncates responses longer than 300 words as a backstop', async () => {
+    const longContent = Array.from({ length: 400 }, (_, i) => `word${i}`).join(' ');
+    global.fetch = vi.fn(async () =>
+      new Response(JSON.stringify({ choices: [{ message: { content: longContent } }] }), { status: 200 })
+    ) as unknown as typeof fetch;
+
+    const result = await callModel(
+      { provider: 'openai-compatible', base_url: 'https://example.com/v1', model: 'test-model', api_key_env: 'TEST_API_KEY' },
+      'sys',
+      'user'
+    );
+
+    const wordCount = result.content.replace(/…$/, '').trim().split(/\s+/).length;
+    expect(wordCount).toBe(300);
+    expect(result.content.endsWith('…')).toBe(true);
+  });
+
+  it('leaves responses at or under 300 words unchanged', async () => {
+    const shortContent = Array.from({ length: 50 }, (_, i) => `word${i}`).join(' ');
+    global.fetch = vi.fn(async () =>
+      new Response(JSON.stringify({ choices: [{ message: { content: shortContent } }] }), { status: 200 })
+    ) as unknown as typeof fetch;
+
+    const result = await callModel(
+      { provider: 'openai-compatible', base_url: 'https://example.com/v1', model: 'test-model', api_key_env: 'TEST_API_KEY' },
+      'sys',
+      'user'
+    );
+
+    expect(result.content).toBe(shortContent);
+  });
+
   it('calls the API with no Authorization header when api_key_env is omitted', async () => {
     global.fetch = vi.fn(async () =>
       new Response(JSON.stringify({ choices: [{ message: { content: 'Hello.' } }] }), { status: 200 })
