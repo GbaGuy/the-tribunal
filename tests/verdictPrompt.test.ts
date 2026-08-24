@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { buildCaseBriefing, buildVerdictPrompt } from '../netlify/functions/_lib/prompts';
+import { buildCaseBriefing, buildVerdictPrompt, buildFinalVerdictPrompt } from '../netlify/functions/_lib/prompts';
 import type { Case } from '../netlify/functions/_lib/types';
 
 const sampleCase: Case = {
@@ -41,5 +41,31 @@ describe('buildVerdictPrompt', () => {
     expect(prompt).toContain('I acted to protect the realm.');
     expect(prompt).toContain('Grey Worm (prosecution)');
     expect(prompt).toContain('He killed an unarmed queen.');
+  });
+});
+
+describe('buildFinalVerdictPrompt', () => {
+  it('includes the case briefing, character arguments, and both panel opinions', () => {
+    const prompt = buildFinalVerdictPrompt(
+      sampleCase,
+      [
+        { name: 'Jon Snow', seat: 'defense', content: 'I acted to protect the realm.' },
+        { name: 'Grey Worm', seat: 'prosecution', content: 'He killed an unarmed queen.' },
+      ],
+      [
+        { name: 'Judge Barak', content: 'The killing was a proportionate necessity.' },
+        { name: 'Judge Elon', content: 'The act cannot be reconciled with due process.' },
+      ]
+    );
+
+    expect(prompt).toContain('The Realm v. Jon Snow');
+    expect(prompt).toContain('Jon Snow (defense)');
+    expect(prompt).toContain('I acted to protect the realm.');
+    expect(prompt).toContain('Grey Worm (prosecution)');
+    expect(prompt).toContain('He killed an unarmed queen.');
+    expect(prompt).toContain('Judge Barak');
+    expect(prompt).toContain('The killing was a proportionate necessity.');
+    expect(prompt).toContain('Judge Elon');
+    expect(prompt).toContain('The act cannot be reconciled with due process.');
   });
 });

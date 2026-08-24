@@ -34,3 +34,28 @@ export function buildVerdictPrompt(theCase: Case, responses: NamedResponse[]): s
     'Render your judgment on the question above, with your reasoning.',
   ].join('\n');
 }
+
+export interface NamedOpinion {
+  name: string;
+  content: string;
+}
+
+export function buildFinalVerdictPrompt(
+  theCase: Case,
+  responses: NamedResponse[],
+  panelOpinions: NamedOpinion[]
+): string {
+  const transcript = responses.map((r) => `${r.name} (${r.seat}):\n${r.content}`).join('\n\n');
+  const opinions = panelOpinions.map((o) => `${o.name}:\n${o.content}`).join('\n\n');
+  return [
+    buildCaseBriefing(theCase),
+    '',
+    'Arguments presented:',
+    transcript,
+    '',
+    "Opinions from your fellow panel judges, who have already reviewed this case:",
+    opinions,
+    '',
+    "Considering both the arguments presented and your fellow judges' opinions, render your own final judgment on the question above, with your reasoning.",
+  ].join('\n');
+}

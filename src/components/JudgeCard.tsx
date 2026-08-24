@@ -7,15 +7,20 @@ export function JudgeCard({
   modelOptions,
   onChangeModel,
   onRetry,
+  roleLabel,
 }: {
   persona: PersonaCardInfo;
   state: CardState;
   modelOptions: ModelOption[];
   onChangeModel: (modelId: string) => void;
   onRetry: () => void;
+  roleLabel?: string;
 }) {
   return (
     <div className="rounded-lg border border-amber-700 bg-stone-900 p-6">
+      {roleLabel && (
+        <span className="text-xs uppercase tracking-wide text-amber-500">{roleLabel}</span>
+      )}
       <h2 className="text-xl font-serif mb-1">{persona.name}</h2>
       <p className="text-sm text-stone-400 mb-1">{persona.description}</p>
       <select

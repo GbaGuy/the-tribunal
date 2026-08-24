@@ -35,6 +35,8 @@ create table if not exists trials (
   id uuid primary key default gen_random_uuid(),
   case_id uuid not null references cases(id),
   judge_persona_id uuid not null references personas(id),
+  panel_judge_1_id uuid not null references personas(id),
+  panel_judge_2_id uuid not null references personas(id),
   status text not null check (status in ('running', 'complete', 'failed')) default 'running',
   created_at timestamptz not null default now(),
   completed_at timestamptz

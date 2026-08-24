@@ -52,6 +52,8 @@ export interface TrialDetail {
     id: string;
     case_id: string;
     judge_persona_id: string;
+    panel_judge_1_id: string;
+    panel_judge_2_id: string;
     status: 'running' | 'complete' | 'failed';
   };
   case: CaseDetail['case'];
@@ -79,11 +81,16 @@ export async function fetchCase(slug: string): Promise<CaseDetail> {
   return res.json();
 }
 
-export async function createTrial(caseId: string, judgePersonaId: string): Promise<{ trialId: string }> {
+export async function createTrial(
+  caseId: string,
+  panelJudge1Id: string,
+  panelJudge2Id: string,
+  finalJudgeId: string
+): Promise<{ trialId: string }> {
   const res = await fetch('/api/trials', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ caseId, judgePersonaId }),
+    body: JSON.stringify({ caseId, panelJudge1Id, panelJudge2Id, finalJudgeId }),
   });
   if (!res.ok) throw new Error(await parseErrorBody(res, 'Failed to create trial'));
   return res.json();
@@ -92,6 +99,12 @@ export async function createTrial(caseId: string, judgePersonaId: string): Promi
 export async function respondAs(trialId: string, personaId: string): Promise<ResponseRow> {
   const res = await fetch(`/api/trials/${trialId}/respond/${personaId}`, { method: 'POST' });
   if (!res.ok) throw new Error(await parseErrorBody(res, 'Character failed to respond'));
+  return res.json();
+}
+
+export async function opineAsJudge(trialId: string, judgeId: string): Promise<ResponseRow> {
+  const res = await fetch(`/api/trials/${trialId}/opine/${judgeId}`, { method: 'POST' });
+  if (!res.ok) throw new Error(await parseErrorBody(res, 'Panel judge failed to render an opinion'));
   return res.json();
 }
 
