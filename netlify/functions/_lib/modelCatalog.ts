@@ -9,19 +9,19 @@ export interface ModelCatalogEntry {
 
 export const MODEL_CATALOG: ModelCatalogEntry[] = [
   {
-    id: 'groq-llama-3.1-8b-instant',
-    label: 'Llama 3.1 8B Instant (Groq)',
+    id: 'groq-allam-2-7b',
+    label: 'Allam 2 7B (Groq)',
     provider: 'openai-compatible',
     base_url: 'https://api.groq.com/openai/v1',
-    model: 'llama-3.1-8b-instant',
+    model: 'allam-2-7b',
     api_key_env: 'GROQ_API_KEY',
   },
   {
-    id: 'groq-llama-3.3-70b-versatile',
-    label: 'Llama 3.3 70B Versatile (Groq)',
+    id: 'groq-qwen3.6-27b',
+    label: 'Qwen 3.6 27B (Groq)',
     provider: 'openai-compatible',
     base_url: 'https://api.groq.com/openai/v1',
-    model: 'llama-3.3-70b-versatile',
+    model: 'qwen/qwen3.6-27b',
     api_key_env: 'GROQ_API_KEY',
   },
   {
