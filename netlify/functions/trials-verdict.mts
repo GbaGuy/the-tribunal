@@ -50,8 +50,6 @@ export default async (_req: Request, context: Context): Promise<Response> => {
       const rows = await sql`
         INSERT INTO responses (trial_id, persona_id, role, content, raw_response, latency_ms)
         VALUES (${trialId}, ${judge.id}, 'judge', ${content}, ${JSON.stringify(raw)}, ${latencyMs})
-        ON CONFLICT (trial_id, persona_id) DO UPDATE SET
-          content = EXCLUDED.content, raw_response = EXCLUDED.raw_response, latency_ms = EXCLUDED.latency_ms, error = NULL, created_at = now()
         RETURNING id, trial_id, persona_id, role, content, latency_ms, error, created_at
       `;
       await sql`UPDATE trials SET status = 'complete', completed_at = now() WHERE id = ${trialId}`;
@@ -62,8 +60,6 @@ export default async (_req: Request, context: Context): Promise<Response> => {
       await sql`
         INSERT INTO responses (trial_id, persona_id, role, error, latency_ms)
         VALUES (${trialId}, ${judge.id}, 'judge', ${message}, ${latencyMs})
-        ON CONFLICT (trial_id, persona_id) DO UPDATE SET
-          error = EXCLUDED.error, latency_ms = EXCLUDED.latency_ms, content = NULL, created_at = now()
       `;
       await sql`UPDATE trials SET status = 'failed', completed_at = now() WHERE id = ${trialId}`;
       return errorResponse(502, `Model call failed: ${message}`);
