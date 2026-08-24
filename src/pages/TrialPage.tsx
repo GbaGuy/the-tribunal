@@ -97,6 +97,7 @@ export function TrialPage() {
   return (
     <div className="min-h-screen bg-stone-950 text-stone-100 p-8 max-w-4xl mx-auto">
       <h1 className="text-2xl font-serif mb-6">{caseDetail.case.title}</h1>
+      <div className="mb-6 whitespace-pre-wrap text-stone-300 text-sm">{caseDetail.case.facts_md}</div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
         {caseDetail.characters.map((character) => (
           <CharacterCard

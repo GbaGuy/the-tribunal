@@ -3,9 +3,9 @@ export type Seat = 'defense' | 'prosecution';
 
 export interface ModelConfig {
   provider: 'openai-compatible' | 'todo';
-  baseUrl?: string;
+  base_url?: string;
   model?: string;
-  apiKeyEnv?: string;
+  api_key_env?: string;
 }
 
 export interface Persona {

@@ -55,3 +55,4 @@ create table if not exists responses (
 
 create index if not exists responses_trial_id_idx on responses (trial_id);
 create index if not exists case_participants_case_id_idx on case_participants (case_id);
+create unique index if not exists responses_trial_persona_unique_idx on responses (trial_id, persona_id);

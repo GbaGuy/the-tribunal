@@ -15,7 +15,8 @@ export default async (_req: Request, context: Context): Promise<Response> => {
     const caseRows = await sql`SELECT * FROM cases WHERE id = ${trial.case_id}`;
 
     const responses = await sql`
-      SELECT r.*, p.name AS persona_name, p.seat AS persona_seat
+      SELECT r.id, r.trial_id, r.persona_id, r.role, r.content, r.latency_ms, r.error, r.created_at,
+             p.name AS persona_name, p.seat AS persona_seat
       FROM responses r
       JOIN personas p ON p.id = r.persona_id
       WHERE r.trial_id = ${trialId}

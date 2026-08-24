@@ -23,7 +23,7 @@ describe('callModel', () => {
     ) as unknown as typeof fetch;
 
     const result = await callModel(
-      { provider: 'openai-compatible', baseUrl: 'https://example.com/v1', model: 'test-model', apiKeyEnv: 'TEST_API_KEY' },
+      { provider: 'openai-compatible', base_url: 'https://example.com/v1', model: 'test-model', api_key_env: 'TEST_API_KEY' },
       'You are Jon Snow.',
       'Was the killing justified?'
     );
@@ -42,7 +42,7 @@ describe('callModel', () => {
 
     await expect(
       callModel(
-        { provider: 'openai-compatible', baseUrl: 'https://example.com/v1', model: 'test-model', apiKeyEnv: 'TEST_API_KEY' },
+        { provider: 'openai-compatible', base_url: 'https://example.com/v1', model: 'test-model', api_key_env: 'TEST_API_KEY' },
         'You are Jon Snow.',
         'Was the killing justified?'
       )
@@ -56,7 +56,7 @@ describe('callModel', () => {
 
     await expect(
       callModel(
-        { provider: 'openai-compatible', baseUrl: 'https://example.com/v1', model: 'test-model', apiKeyEnv: 'TEST_API_KEY' },
+        { provider: 'openai-compatible', base_url: 'https://example.com/v1', model: 'test-model', api_key_env: 'TEST_API_KEY' },
         'sys',
         'user'
       )
@@ -67,7 +67,7 @@ describe('callModel', () => {
     delete process.env.MISSING_KEY;
     await expect(
       callModel(
-        { provider: 'openai-compatible', baseUrl: 'https://example.com/v1', model: 'test-model', apiKeyEnv: 'MISSING_KEY' },
+        { provider: 'openai-compatible', base_url: 'https://example.com/v1', model: 'test-model', api_key_env: 'MISSING_KEY' },
         'sys',
         'user'
       )
@@ -87,7 +87,7 @@ describe('callModel', () => {
 
     await expect(
       callModel(
-        { provider: 'openai-compatible', baseUrl: 'https://example.com/v1', model: 'test-model', apiKeyEnv: 'TEST_API_KEY' },
+        { provider: 'openai-compatible', base_url: 'https://example.com/v1', model: 'test-model', api_key_env: 'TEST_API_KEY' },
         'sys',
         'user'
       )

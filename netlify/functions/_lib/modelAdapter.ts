@@ -21,17 +21,17 @@ async function callOpenAiCompatible(
   systemPrompt: string,
   userMessage: string
 ): Promise<ModelCallResult> {
-  const { baseUrl, model, apiKeyEnv } = modelConfig;
-  if (!baseUrl || !model || !apiKeyEnv) {
-    throw new Error('openai-compatible model config requires baseUrl, model, and apiKeyEnv');
+  const { base_url, model, api_key_env } = modelConfig;
+  if (!base_url || !model || !api_key_env) {
+    throw new Error('openai-compatible model config requires base_url, model, and api_key_env');
   }
 
-  const apiKey = process.env[apiKeyEnv];
+  const apiKey = process.env[api_key_env];
   if (!apiKey) {
-    throw new Error(`Missing environment variable: ${apiKeyEnv}`);
+    throw new Error(`Missing environment variable: ${api_key_env}`);
   }
 
-  const response = await fetch(`${baseUrl}/chat/completions`, {
+  const response = await fetch(`${base_url}/chat/completions`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
