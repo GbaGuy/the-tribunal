@@ -52,8 +52,8 @@ export interface TrialDetail {
     id: string;
     case_id: string;
     judge_persona_id: string;
-    panel_judge_1_id: string;
-    panel_judge_2_id: string;
+    defense_panel_judge_id: string;
+    prosecution_panel_judge_id: string;
     status: 'running' | 'complete' | 'failed';
   };
   case: CaseDetail['case'];
@@ -83,14 +83,14 @@ export async function fetchCase(slug: string): Promise<CaseDetail> {
 
 export async function createTrial(
   caseId: string,
-  panelJudge1Id: string,
-  panelJudge2Id: string,
+  defensePanelJudgeId: string,
+  prosecutionPanelJudgeId: string,
   finalJudgeId: string
 ): Promise<{ trialId: string }> {
   const res = await fetch('/api/trials', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ caseId, panelJudge1Id, panelJudge2Id, finalJudgeId }),
+    body: JSON.stringify({ caseId, defensePanelJudgeId, prosecutionPanelJudgeId, finalJudgeId }),
   });
   if (!res.ok) throw new Error(await parseErrorBody(res, 'Failed to create trial'));
   return res.json();

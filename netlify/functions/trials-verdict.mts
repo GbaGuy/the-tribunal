@@ -44,7 +44,7 @@ export default async (_req: Request, context: Context): Promise<Response> => {
       JOIN personas p ON p.id = r.persona_id
       WHERE r.trial_id = ${trialId}
         AND r.role = 'judge'
-        AND r.persona_id IN (${trial.panel_judge_1_id}, ${trial.panel_judge_2_id})
+        AND r.persona_id IN (${trial.defense_panel_judge_id}, ${trial.prosecution_panel_judge_id})
         AND r.content IS NOT NULL
       ORDER BY r.persona_id, r.created_at DESC
     `;

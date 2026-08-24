@@ -3,26 +3,26 @@ import { getSql } from './_lib/db';
 import { json, errorResponse } from './_lib/http';
 
 export default async (req: Request): Promise<Response> => {
-  let body: { caseId?: string; panelJudge1Id?: string; panelJudge2Id?: string; finalJudgeId?: string };
+  let body: { caseId?: string; defensePanelJudgeId?: string; prosecutionPanelJudgeId?: string; finalJudgeId?: string };
   try {
     body = await req.json();
   } catch {
     return errorResponse(400, 'Request body must be JSON');
   }
 
-  const { caseId, panelJudge1Id, panelJudge2Id, finalJudgeId } = body;
-  if (!caseId || !panelJudge1Id || !panelJudge2Id || !finalJudgeId) {
-    return errorResponse(400, 'caseId, panelJudge1Id, panelJudge2Id, and finalJudgeId are required');
+  const { caseId, defensePanelJudgeId, prosecutionPanelJudgeId, finalJudgeId } = body;
+  if (!caseId || !defensePanelJudgeId || !prosecutionPanelJudgeId || !finalJudgeId) {
+    return errorResponse(400, 'caseId, defensePanelJudgeId, prosecutionPanelJudgeId, and finalJudgeId are required');
   }
-  if (new Set([panelJudge1Id, panelJudge2Id, finalJudgeId]).size !== 3) {
-    return errorResponse(400, 'panelJudge1Id, panelJudge2Id, and finalJudgeId must all be different judges');
+  if (new Set([defensePanelJudgeId, prosecutionPanelJudgeId, finalJudgeId]).size !== 3) {
+    return errorResponse(400, 'defensePanelJudgeId, prosecutionPanelJudgeId, and finalJudgeId must all be different judges');
   }
 
   try {
     const sql = getSql();
     const rows = await sql`
-      INSERT INTO trials (case_id, judge_persona_id, panel_judge_1_id, panel_judge_2_id, status)
-      VALUES (${caseId}, ${finalJudgeId}, ${panelJudge1Id}, ${panelJudge2Id}, 'running')
+      INSERT INTO trials (case_id, judge_persona_id, defense_panel_judge_id, prosecution_panel_judge_id, status)
+      VALUES (${caseId}, ${finalJudgeId}, ${defensePanelJudgeId}, ${prosecutionPanelJudgeId}, 'running')
       RETURNING id
     `;
     return json({ trialId: rows[0].id }, 201);

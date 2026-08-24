@@ -5,8 +5,8 @@ import { fetchCases, fetchCase, createTrial, type CaseDetail } from '../api/clie
 export function HomePage() {
   const navigate = useNavigate();
   const [detail, setDetail] = useState<CaseDetail | null>(null);
-  const [panelJudge1Id, setPanelJudge1Id] = useState<string | null>(null);
-  const [panelJudge2Id, setPanelJudge2Id] = useState<string | null>(null);
+  const [defensePanelJudgeId, setDefensePanelJudgeId] = useState<string | null>(null);
+  const [prosecutionPanelJudgeId, setProsecutionPanelJudgeId] = useState<string | null>(null);
   const [finalJudgeId, setFinalJudgeId] = useState<string | null>(null);
   const [starting, setStarting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -18,8 +18,8 @@ export function HomePage() {
         if (cases.length === 0) throw new Error('No cases available');
         const full = await fetchCase(cases[0].slug);
         setDetail(full);
-        setPanelJudge1Id(full.judges[0]?.id ?? null);
-        setPanelJudge2Id(full.judges[1]?.id ?? null);
+        setDefensePanelJudgeId(full.judges[0]?.id ?? null);
+        setProsecutionPanelJudgeId(full.judges[1]?.id ?? null);
         setFinalJudgeId(full.judges[2]?.id ?? null);
       } catch (err) {
         setError((err as Error).message);
@@ -29,16 +29,21 @@ export function HomePage() {
   }, []);
 
   const rolesDistinct =
-    !!panelJudge1Id &&
-    !!panelJudge2Id &&
+    !!defensePanelJudgeId &&
+    !!prosecutionPanelJudgeId &&
     !!finalJudgeId &&
-    new Set([panelJudge1Id, panelJudge2Id, finalJudgeId]).size === 3;
+    new Set([defensePanelJudgeId, prosecutionPanelJudgeId, finalJudgeId]).size === 3;
 
   async function beginTrial() {
     if (!detail || !rolesDistinct) return;
     setStarting(true);
     try {
-      const { trialId } = await createTrial(detail.case.id, panelJudge1Id!, panelJudge2Id!, finalJudgeId!);
+      const { trialId } = await createTrial(
+        detail.case.id,
+        defensePanelJudgeId!,
+        prosecutionPanelJudgeId!,
+        finalJudgeId!
+      );
       navigate(`/trial/${trialId}`);
     } catch (err) {
       setError((err as Error).message);
@@ -57,21 +62,22 @@ export function HomePage() {
 
       <h2 className="text-xl font-serif mb-3">Assign the bench</h2>
       <p className="text-sm text-stone-400 mb-4">
-        Two panel judges will each independently review the testimony. The final judge then reads both
-        panel opinions, alongside the testimony itself, and renders the verdict.
+        The defense panel judge reviews only the defense testimony; the prosecution panel judge reviews
+        only the prosecution testimony. The final judge then reads all four character responses, both
+        panel opinions, and renders the verdict.
       </p>
       <div className="space-y-4 mb-8">
         <JudgeSelect
-          label="Panel Judge 1"
+          label="Defense Panel Judge"
           judges={detail.judges}
-          value={panelJudge1Id}
-          onChange={setPanelJudge1Id}
+          value={defensePanelJudgeId}
+          onChange={setDefensePanelJudgeId}
         />
         <JudgeSelect
-          label="Panel Judge 2"
+          label="Prosecution Panel Judge"
           judges={detail.judges}
-          value={panelJudge2Id}
-          onChange={setPanelJudge2Id}
+          value={prosecutionPanelJudgeId}
+          onChange={setProsecutionPanelJudgeId}
         />
         <JudgeSelect label="Final Judge" judges={detail.judges} value={finalJudgeId} onChange={setFinalJudgeId} />
         {!rolesDistinct && (

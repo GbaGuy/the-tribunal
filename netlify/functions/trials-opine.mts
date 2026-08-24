@@ -16,7 +16,12 @@ export default async (_req: Request, context: Context): Promise<Response> => {
     }
     const trial = trialRows[0];
 
-    if (judgeId !== trial.panel_judge_1_id && judgeId !== trial.panel_judge_2_id) {
+    let side: 'defense' | 'prosecution';
+    if (judgeId === trial.defense_panel_judge_id) {
+      side = 'defense';
+    } else if (judgeId === trial.prosecution_panel_judge_id) {
+      side = 'prosecution';
+    } else {
       return errorResponse(400, `Persona ${judgeId} is not a panel judge for trial ${trialId}`);
     }
 
@@ -33,12 +38,12 @@ export default async (_req: Request, context: Context): Promise<Response> => {
       SELECT DISTINCT ON (r.persona_id) r.content, p.name, p.seat
       FROM responses r
       JOIN personas p ON p.id = r.persona_id
-      WHERE r.trial_id = ${trialId} AND r.role = 'character' AND r.content IS NOT NULL
+      WHERE r.trial_id = ${trialId} AND r.role = 'character' AND r.content IS NOT NULL AND p.seat = ${side}
       ORDER BY r.persona_id, r.created_at DESC
     `;
 
     if (characterResponses.length === 0) {
-      return errorResponse(422, 'No character responses are available for a panel judge to review');
+      return errorResponse(422, `No ${side} character responses are available for a panel judge to review`);
     }
 
     const userMessage = buildVerdictPrompt(

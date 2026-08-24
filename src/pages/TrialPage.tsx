@@ -18,8 +18,8 @@ import type { CardState } from '../components/cardTypes';
 export function TrialPage() {
   const { trialId } = useParams<{ trialId: string }>();
   const [caseDetail, setCaseDetail] = useState<CaseDetail | null>(null);
-  const [panelJudge1Id, setPanelJudge1Id] = useState<string | null>(null);
-  const [panelJudge2Id, setPanelJudge2Id] = useState<string | null>(null);
+  const [defensePanelJudgeId, setDefensePanelJudgeId] = useState<string | null>(null);
+  const [prosecutionPanelJudgeId, setProsecutionPanelJudgeId] = useState<string | null>(null);
   const [finalJudgeId, setFinalJudgeId] = useState<string | null>(null);
   const [modelOptions, setModelOptions] = useState<ModelOption[]>([]);
   const [cardStates, setCardStates] = useState<Record<string, CardState>>({});
@@ -86,8 +86,8 @@ export function TrialPage() {
         const detail = await fetchCase(trialData.case.slug);
         if (cancelledRef.current) return;
         setCaseDetail(detail);
-        setPanelJudge1Id(trialData.trial.panel_judge_1_id);
-        setPanelJudge2Id(trialData.trial.panel_judge_2_id);
+        setDefensePanelJudgeId(trialData.trial.defense_panel_judge_id);
+        setProsecutionPanelJudgeId(trialData.trial.prosecution_panel_judge_id);
         setFinalJudgeId(trialData.trial.judge_persona_id);
         setModelOptions(models);
 
@@ -106,7 +106,7 @@ export function TrialPage() {
         }
         setCardStates(initialCardStates);
 
-        const panelIds = [trialData.trial.panel_judge_1_id, trialData.trial.panel_judge_2_id];
+        const panelIds = [trialData.trial.defense_panel_judge_id, trialData.trial.prosecution_panel_judge_id];
         const initialPanelStates: Record<string, CardState> = {};
         for (const judgeId of panelIds) {
           const existing = existingByPersona.get(judgeId);
@@ -176,8 +176,8 @@ export function TrialPage() {
   if (loadError) return <div className="p-8 text-red-400">{loadError}</div>;
   if (!caseDetail) return <div className="p-8 text-stone-100">Loading trial…</div>;
 
-  const panelJudge1 = caseDetail.judges.find((j) => j.id === panelJudge1Id);
-  const panelJudge2 = caseDetail.judges.find((j) => j.id === panelJudge2Id);
+  const defenseJudge = caseDetail.judges.find((j) => j.id === defensePanelJudgeId);
+  const prosecutionJudge = caseDetail.judges.find((j) => j.id === prosecutionPanelJudgeId);
   const finalJudge = caseDetail.judges.find((j) => j.id === finalJudgeId);
 
   return (
@@ -199,8 +199,11 @@ export function TrialPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-        {[panelJudge1, panelJudge2].map(
-          (judge) =>
+        {[
+          { judge: defenseJudge, roleLabel: 'Defense Panel Judge' },
+          { judge: prosecutionJudge, roleLabel: 'Prosecution Panel Judge' },
+        ].map(
+          ({ judge, roleLabel }) =>
             judge && (
               <JudgeCard
                 key={judge.id}
@@ -209,7 +212,7 @@ export function TrialPage() {
                 modelOptions={modelOptions}
                 onChangeModel={(modelId) => handleChangeModel(judge.id, modelId)}
                 onRetry={() => runPanelJudge(judge.id)}
-                roleLabel="Panel Judge"
+                roleLabel={roleLabel}
               />
             )
         )}
