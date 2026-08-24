@@ -46,12 +46,12 @@ async function callOpenAiCompatible(
     }),
   });
 
-  const raw = await response.json();
-
   if (!response.ok) {
-    throw new Error(`Model call failed with status ${response.status}: ${JSON.stringify(raw)}`);
+    const bodyText = await response.text();
+    throw new Error(`Model call failed with status ${response.status}: ${bodyText}`);
   }
 
+  const raw = await response.json();
   const content = (raw as any)?.choices?.[0]?.message?.content;
   if (typeof content !== 'string') {
     throw new Error(`Unexpected response shape from model: ${JSON.stringify(raw)}`);

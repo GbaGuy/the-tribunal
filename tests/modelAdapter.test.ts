@@ -79,4 +79,18 @@ describe('callModel', () => {
       /Unsupported model provider/
     );
   });
+
+  it('throws with the raw response body when a non-2xx response is not valid JSON', async () => {
+    global.fetch = vi.fn(async () =>
+      new Response('<html><body>Bad Gateway</body></html>', { status: 502 })
+    ) as unknown as typeof fetch;
+
+    await expect(
+      callModel(
+        { provider: 'openai-compatible', baseUrl: 'https://example.com/v1', model: 'test-model', apiKeyEnv: 'TEST_API_KEY' },
+        'sys',
+        'user'
+      )
+    ).rejects.toThrow(/502/);
+  });
 });
