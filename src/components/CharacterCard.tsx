@@ -8,7 +8,8 @@ export function CharacterCard({ persona, state }: { persona: PersonaCardInfo; st
         <h2 className="text-lg font-serif">{persona.name}</h2>
         <span className="text-xs uppercase tracking-wide text-stone-400">{persona.seat}</span>
       </div>
-      <p className="text-sm text-stone-400 mb-3">{persona.description}</p>
+      <p className={`text-sm text-stone-400 ${persona.model ? 'mb-1' : 'mb-3'}`}>{persona.description}</p>
+      {persona.model && <p className="text-xs text-stone-500 font-mono mb-3">{persona.model}</p>}
       {state.status === 'loading' && <p className="text-stone-500 italic">…gathering testimony</p>}
       {state.status === 'error' && <p className="text-red-400">{state.error}</p>}
       {state.status === 'done' && <p className="whitespace-pre-wrap">{state.content}</p>}

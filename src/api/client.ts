@@ -10,6 +10,7 @@ export interface PersonaSummary {
   kind: 'character' | 'judge';
   seat: 'defense' | 'prosecution' | null;
   description: string;
+  model: string | null;
 }
 
 export interface CaseDetail {

@@ -13,7 +13,7 @@ export default async (_req: Request, context: Context): Promise<Response> => {
     const theCase = caseRows[0];
 
     const characters = await sql`
-      SELECT p.id, p.name, p.kind, p.seat, p.description
+      SELECT p.id, p.name, p.kind, p.seat, p.description, p.model_config->>'model' AS model
       FROM personas p
       JOIN case_participants cp ON cp.persona_id = p.id
       WHERE cp.case_id = ${theCase.id}
@@ -21,7 +21,7 @@ export default async (_req: Request, context: Context): Promise<Response> => {
     `;
 
     const judges = await sql`
-      SELECT id, name, kind, seat, description
+      SELECT id, name, kind, seat, description, model_config->>'model' AS model
       FROM personas
       WHERE kind = 'judge'
       ORDER BY name
