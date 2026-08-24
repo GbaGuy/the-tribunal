@@ -22,21 +22,22 @@ async function callOpenAiCompatible(
   userMessage: string
 ): Promise<ModelCallResult> {
   const { base_url, model, api_key_env } = modelConfig;
-  if (!base_url || !model || !api_key_env) {
-    throw new Error('openai-compatible model config requires base_url, model, and api_key_env');
+  if (!base_url || !model) {
+    throw new Error('openai-compatible model config requires base_url and model');
   }
 
-  const apiKey = process.env[api_key_env];
-  if (!apiKey) {
-    throw new Error(`Missing environment variable: ${api_key_env}`);
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (api_key_env) {
+    const apiKey = process.env[api_key_env];
+    if (!apiKey) {
+      throw new Error(`Missing environment variable: ${api_key_env}`);
+    }
+    headers.Authorization = `Bearer ${apiKey}`;
   }
 
   const response = await fetch(`${base_url}/chat/completions`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${apiKey}`,
-    },
+    headers,
     body: JSON.stringify({
       model,
       messages: [

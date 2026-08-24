@@ -4,7 +4,7 @@ export interface ModelCatalogEntry {
   provider: 'openai-compatible';
   base_url: string;
   model: string;
-  api_key_env: string;
+  api_key_env?: string;
 }
 
 export const MODEL_CATALOG: ModelCatalogEntry[] = [
@@ -159,5 +159,84 @@ export const MODEL_CATALOG: ModelCatalogEntry[] = [
     base_url: 'https://openrouter.ai/api/v1',
     model: 'dots-studio/dots-3-note-preview:free',
     api_key_env: 'OPENROUTER_API_KEY',
+  },
+  // OVHcloud AI Endpoints — no API key required, confirmed via a live anonymous request.
+  {
+    id: 'ovhcloud-llama-3.3-70b',
+    label: 'Llama 3.3 70B (Meta, via OVHcloud — no key needed)',
+    provider: 'openai-compatible',
+    base_url: 'https://oai.endpoints.kepler.ai.cloud.ovh.net/v1',
+    model: 'Meta-Llama-3_3-70B-Instruct',
+  },
+  {
+    id: 'ovhcloud-mistral-small-3.2',
+    label: 'Mistral Small 3.2 24B (via OVHcloud — no key needed)',
+    provider: 'openai-compatible',
+    base_url: 'https://oai.endpoints.kepler.ai.cloud.ovh.net/v1',
+    model: 'Mistral-Small-3.2-24B-Instruct-2506',
+  },
+  {
+    id: 'ovhcloud-mistral-nemo',
+    label: 'Mistral Nemo (via OVHcloud — no key needed)',
+    provider: 'openai-compatible',
+    base_url: 'https://oai.endpoints.kepler.ai.cloud.ovh.net/v1',
+    model: 'Mistral-Nemo-Instruct-2407',
+  },
+  {
+    id: 'ovhcloud-gpt-oss-120b',
+    label: 'GPT-OSS 120B (via OVHcloud — no key needed)',
+    provider: 'openai-compatible',
+    base_url: 'https://oai.endpoints.kepler.ai.cloud.ovh.net/v1',
+    model: 'gpt-oss-120b',
+  },
+  {
+    id: 'ovhcloud-gpt-oss-20b',
+    label: 'GPT-OSS 20B (via OVHcloud — no key needed)',
+    provider: 'openai-compatible',
+    base_url: 'https://oai.endpoints.kepler.ai.cloud.ovh.net/v1',
+    model: 'gpt-oss-20b',
+  },
+  {
+    id: 'ovhcloud-qwen3-32b',
+    label: 'Qwen3 32B (via OVHcloud — no key needed)',
+    provider: 'openai-compatible',
+    base_url: 'https://oai.endpoints.kepler.ai.cloud.ovh.net/v1',
+    model: 'Qwen3-32B',
+  },
+  {
+    id: 'ovhcloud-qwen3.6-27b',
+    label: 'Qwen 3.6 27B (via OVHcloud — no key needed)',
+    provider: 'openai-compatible',
+    base_url: 'https://oai.endpoints.kepler.ai.cloud.ovh.net/v1',
+    model: 'Qwen3.6-27B',
+  },
+  // Kilo Code gateway — no API key required, confirmed via live anonymous requests.
+  {
+    id: 'kilocode-auto-free',
+    label: 'Auto Free (Kilo Code — no key needed)',
+    provider: 'openai-compatible',
+    base_url: 'https://api.kilo.ai/api/gateway/v1',
+    model: 'kilo-auto/free',
+  },
+  {
+    id: 'kilocode-openrouter-free',
+    label: 'OpenRouter Free (via Kilo Code — no key needed)',
+    provider: 'openai-compatible',
+    base_url: 'https://api.kilo.ai/api/gateway/v1',
+    model: 'openrouter/free',
+  },
+  {
+    id: 'kilocode-longcat-2.0',
+    label: 'LongCat 2.0 (Meituan, via Kilo Code — no key needed)',
+    provider: 'openai-compatible',
+    base_url: 'https://api.kilo.ai/api/gateway/v1',
+    model: 'meituan/longcat-2.0-free',
+  },
+  {
+    id: 'kilocode-hy3',
+    label: 'HY3 (Tencent, via Kilo Code — no key needed)',
+    provider: 'openai-compatible',
+    base_url: 'https://api.kilo.ai/api/gateway/v1',
+    model: 'tencent/hy3:free',
   },
 ];

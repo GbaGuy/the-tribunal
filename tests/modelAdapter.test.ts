@@ -93,4 +93,20 @@ describe('callModel', () => {
       )
     ).rejects.toThrow(/502/);
   });
+
+  it('calls the API with no Authorization header when api_key_env is omitted', async () => {
+    global.fetch = vi.fn(async () =>
+      new Response(JSON.stringify({ choices: [{ message: { content: 'Hello.' } }] }), { status: 200 })
+    ) as unknown as typeof fetch;
+
+    const result = await callModel(
+      { provider: 'openai-compatible', base_url: 'https://example.com/v1', model: 'test-model' },
+      'sys',
+      'user'
+    );
+
+    expect(result.content).toBe('Hello.');
+    const [, requestInit] = (global.fetch as any).mock.calls[0];
+    expect(requestInit.headers).not.toHaveProperty('Authorization');
+  });
 });
