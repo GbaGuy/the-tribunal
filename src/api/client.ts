@@ -11,6 +11,12 @@ export interface PersonaSummary {
   seat: 'defense' | 'prosecution' | null;
   description: string;
   model: string | null;
+  modelId: string | null;
+}
+
+export interface ModelOption {
+  id: string;
+  label: string;
 }
 
 export interface CaseDetail {
@@ -98,5 +104,24 @@ export async function requestVerdict(trialId: string): Promise<ResponseRow> {
 export async function fetchTrial(trialId: string): Promise<TrialDetail> {
   const res = await fetch(`/api/trials/${trialId}`);
   if (!res.ok) throw new Error(await parseErrorBody(res, 'Failed to load trial'));
+  return res.json();
+}
+
+export async function fetchModels(): Promise<ModelOption[]> {
+  const res = await fetch('/api/models');
+  if (!res.ok) throw new Error(await parseErrorBody(res, 'Failed to load models'));
+  return res.json();
+}
+
+export async function setPersonaModel(
+  personaId: string,
+  modelId: string
+): Promise<{ id: string; model: string; modelId: string }> {
+  const res = await fetch(`/api/personas/${personaId}/model`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ modelId }),
+  });
+  if (!res.ok) throw new Error(await parseErrorBody(res, 'Failed to set model'));
   return res.json();
 }

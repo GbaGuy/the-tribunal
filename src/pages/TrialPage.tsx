@@ -1,6 +1,16 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { fetchTrial, fetchCase, respondAs, requestVerdict, type CaseDetail, type ResponseRow } from '../api/client';
+import {
+  fetchTrial,
+  fetchCase,
+  fetchModels,
+  respondAs,
+  requestVerdict,
+  setPersonaModel,
+  type CaseDetail,
+  type ResponseRow,
+  type ModelOption,
+} from '../api/client';
 import { CharacterCard } from '../components/CharacterCard';
 import { JudgeCard } from '../components/JudgeCard';
 import type { CardState } from '../components/cardTypes';
@@ -9,21 +19,54 @@ export function TrialPage() {
   const { trialId } = useParams<{ trialId: string }>();
   const [caseDetail, setCaseDetail] = useState<CaseDetail | null>(null);
   const [judgePersonaId, setJudgePersonaId] = useState<string | null>(null);
+  const [modelOptions, setModelOptions] = useState<ModelOption[]>([]);
   const [cardStates, setCardStates] = useState<Record<string, CardState>>({});
   const [verdict, setVerdict] = useState<CardState>({ status: 'pending' });
   const [loadError, setLoadError] = useState<string | null>(null);
+  const cancelledRef = useRef(false);
+
+  async function runCharacter(personaId: string) {
+    setCardStates((prev) => ({ ...prev, [personaId]: { status: 'loading' } }));
+    try {
+      const response = await respondAs(trialId!, personaId);
+      if (cancelledRef.current) return;
+      setCardStates((prev) => ({
+        ...prev,
+        [personaId]: { status: 'done', content: response.content ?? undefined },
+      }));
+    } catch (err) {
+      if (cancelledRef.current) return;
+      setCardStates((prev) => ({
+        ...prev,
+        [personaId]: { status: 'error', error: (err as Error).message },
+      }));
+    }
+  }
+
+  async function runVerdict() {
+    setVerdict({ status: 'loading' });
+    try {
+      const response = await requestVerdict(trialId!);
+      if (cancelledRef.current) return;
+      setVerdict({ status: 'done', content: response.content ?? undefined });
+    } catch (err) {
+      if (cancelledRef.current) return;
+      setVerdict({ status: 'error', error: (err as Error).message });
+    }
+  }
 
   useEffect(() => {
     if (!trialId) return;
-    let cancelled = false;
+    cancelledRef.current = false;
 
     async function run() {
       try {
-        const trialData = await fetchTrial(trialId!);
+        const [trialData, models] = await Promise.all([fetchTrial(trialId!), fetchModels()]);
         const detail = await fetchCase(trialData.case.slug);
-        if (cancelled) return;
+        if (cancelledRef.current) return;
         setCaseDetail(detail);
         setJudgePersonaId(trialData.trial.judge_persona_id);
+        setModelOptions(models);
 
         const existingByPersona = new Map(trialData.responses.map((r) => [r.persona_id, r]));
 
@@ -39,26 +82,12 @@ export function TrialPage() {
         setCardStates(initialStates);
 
         await Promise.all(
-          detail.characters.map(async (character) => {
-            if (existingByPersona.has(character.id)) return;
-            try {
-              const response = await respondAs(trialId!, character.id);
-              if (cancelled) return;
-              setCardStates((prev) => ({
-                ...prev,
-                [character.id]: { status: 'done', content: response.content ?? undefined },
-              }));
-            } catch (err) {
-              if (cancelled) return;
-              setCardStates((prev) => ({
-                ...prev,
-                [character.id]: { status: 'error', error: (err as Error).message },
-              }));
-            }
-          })
+          detail.characters
+            .filter((character) => !existingByPersona.has(character.id))
+            .map((character) => runCharacter(character.id))
         );
 
-        if (cancelled) return;
+        if (cancelledRef.current) return;
 
         const existingVerdict = trialData.responses.find((r: ResponseRow) => r.role === 'judge');
         if (existingVerdict) {
@@ -68,26 +97,38 @@ export function TrialPage() {
               : { status: 'done', content: existingVerdict.content ?? undefined }
           );
         } else {
-          setVerdict({ status: 'loading' });
-          try {
-            const response = await requestVerdict(trialId!);
-            if (cancelled) return;
-            setVerdict({ status: 'done', content: response.content ?? undefined });
-          } catch (err) {
-            if (cancelled) return;
-            setVerdict({ status: 'error', error: (err as Error).message });
-          }
+          await runVerdict();
         }
       } catch (err) {
-        if (!cancelled) setLoadError((err as Error).message);
+        if (!cancelledRef.current) setLoadError((err as Error).message);
       }
     }
 
     run();
     return () => {
-      cancelled = true;
+      cancelledRef.current = true;
     };
   }, [trialId]);
+
+  async function handleChangeModel(personaId: string, modelId: string) {
+    try {
+      const updated = await setPersonaModel(personaId, modelId);
+      setCaseDetail((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          characters: prev.characters.map((c) =>
+            c.id === personaId ? { ...c, model: updated.model, modelId: updated.modelId } : c
+          ),
+          judges: prev.judges.map((j) =>
+            j.id === personaId ? { ...j, model: updated.model, modelId: updated.modelId } : j
+          ),
+        };
+      });
+    } catch (err) {
+      window.alert(`Failed to change model: ${(err as Error).message}`);
+    }
+  }
 
   if (loadError) return <div className="p-8 text-red-400">{loadError}</div>;
   if (!caseDetail) return <div className="p-8 text-stone-100">Loading trial…</div>;
@@ -104,10 +145,21 @@ export function TrialPage() {
             key={character.id}
             persona={character}
             state={cardStates[character.id] ?? { status: 'pending' }}
+            modelOptions={modelOptions}
+            onChangeModel={(modelId) => handleChangeModel(character.id, modelId)}
+            onRetry={() => runCharacter(character.id)}
           />
         ))}
       </div>
-      {judge && <JudgeCard persona={judge} state={verdict} />}
+      {judge && (
+        <JudgeCard
+          persona={judge}
+          state={verdict}
+          modelOptions={modelOptions}
+          onChangeModel={(modelId) => handleChangeModel(judge.id, modelId)}
+          onRetry={runVerdict}
+        />
+      )}
     </div>
   );
 }

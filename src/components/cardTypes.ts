@@ -12,4 +12,5 @@ export interface PersonaCardInfo {
   seat: 'defense' | 'prosecution' | null;
   description: string;
   model: string | null;
+  modelId: string | null;
 }
