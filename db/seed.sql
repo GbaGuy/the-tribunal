@@ -41,7 +41,7 @@ Simulation rule: your assigned seat (defense) fixes only your procedural role, n
 You will be given the case facts and the question for judgment. Respond in your own voice, arguing your position on whether the killing was justified. Keep your response to a few focused paragraphs - this is testimony, not a legal brief.$$,
     '{"provider":"todo","api_key_env":"JON_SNOW_API_KEY"}'::jsonb
   )
-  ON CONFLICT (name, kind) DO UPDATE SET description = EXCLUDED.description, system_prompt = EXCLUDED.system_prompt
+  ON CONFLICT (name, kind) DO UPDATE SET description = EXCLUDED.description, system_prompt = EXCLUDED.system_prompt, model_config = EXCLUDED.model_config
   RETURNING id
 ),
 tyrion AS (
@@ -60,7 +60,7 @@ Simulation rule: your assigned seat (defense) fixes only your procedural role, n
 You will be given the case facts and the question for judgment. Respond in your own voice, arguing your position on whether the killing was justified. Keep your response to a few focused paragraphs - this is testimony, not a legal brief.$$,
     '{"provider":"todo","api_key_env":"TYRION_API_KEY"}'::jsonb
   )
-  ON CONFLICT (name, kind) DO UPDATE SET description = EXCLUDED.description, system_prompt = EXCLUDED.system_prompt
+  ON CONFLICT (name, kind) DO UPDATE SET description = EXCLUDED.description, system_prompt = EXCLUDED.system_prompt, model_config = EXCLUDED.model_config
   RETURNING id
 ),
 daenerys AS (
@@ -79,7 +79,7 @@ Simulation rule: your assigned seat (prosecution) fixes only your procedural rol
 You will be given the case facts and the question for judgment. Respond in your own voice, arguing your position on whether the killing was justified. Keep your response to a few focused paragraphs - this is testimony, not a legal brief.$$,
     '{"provider":"todo","api_key_env":"DAENERYS_API_KEY"}'::jsonb
   )
-  ON CONFLICT (name, kind) DO UPDATE SET description = EXCLUDED.description, system_prompt = EXCLUDED.system_prompt
+  ON CONFLICT (name, kind) DO UPDATE SET description = EXCLUDED.description, system_prompt = EXCLUDED.system_prompt, model_config = EXCLUDED.model_config
   RETURNING id
 ),
 greyworm AS (
@@ -98,7 +98,7 @@ Simulation rule: your assigned seat (prosecution) fixes only your procedural rol
 You will be given the case facts and the question for judgment. Respond in your own voice, arguing your position on whether the killing was justified. Keep your response to a few focused paragraphs - this is testimony, not a legal brief.$$,
     '{"provider":"todo","api_key_env":"GREYWORM_API_KEY"}'::jsonb
   )
-  ON CONFLICT (name, kind) DO UPDATE SET description = EXCLUDED.description, system_prompt = EXCLUDED.system_prompt
+  ON CONFLICT (name, kind) DO UPDATE SET description = EXCLUDED.description, system_prompt = EXCLUDED.system_prompt, model_config = EXCLUDED.model_config
   RETURNING id
 ),
 barak AS (
@@ -117,7 +117,7 @@ Method: build an intellectual structure before resolving the dispute. Define ter
 You will be given the case facts, the question for judgment, and the arguments presented by four parties (two defense, two prosecution). Read them, then render your own judgment - justified or not justified - with reasons, following your characteristic method. This is a fictional proceeding: you are adapting a judicial method to a fictional case, not issuing a real ruling.$$,
     '{"provider":"todo","api_key_env":"JUDGE_BARAK_API_KEY"}'::jsonb
   )
-  ON CONFLICT (name, kind) DO UPDATE SET description = EXCLUDED.description, system_prompt = EXCLUDED.system_prompt
+  ON CONFLICT (name, kind) DO UPDATE SET description = EXCLUDED.description, system_prompt = EXCLUDED.system_prompt, model_config = EXCLUDED.model_config
   RETURNING id
 ),
 elon AS (
@@ -136,7 +136,7 @@ Method: begin with the legal source and the court's competence, then move throug
 You will be given the case facts, the question for judgment, and the arguments presented by four parties (two defense, two prosecution). Read them, then render your own judgment - justified or not justified - with reasons, following your characteristic method. This is a fictional proceeding: you are adapting a judicial method to a fictional case, not issuing a real ruling.$$,
     '{"provider":"todo","api_key_env":"JUDGE_ELON_API_KEY"}'::jsonb
   )
-  ON CONFLICT (name, kind) DO UPDATE SET description = EXCLUDED.description, system_prompt = EXCLUDED.system_prompt
+  ON CONFLICT (name, kind) DO UPDATE SET description = EXCLUDED.description, system_prompt = EXCLUDED.system_prompt, model_config = EXCLUDED.model_config
   RETURNING id
 ),
 shamgar AS (
@@ -155,7 +155,7 @@ Method: reconstruct the chronology, state the parties' positions fairly, isolate
 You will be given the case facts, the question for judgment, and the arguments presented by four parties (two defense, two prosecution). Read them, then render your own judgment - justified or not justified - with reasons, following your characteristic method. This is a fictional proceeding: you are adapting a judicial method to a fictional case, not issuing a real ruling.$$,
     '{"provider":"todo","api_key_env":"JUDGE_SHAMGAR_API_KEY"}'::jsonb
   )
-  ON CONFLICT (name, kind) DO UPDATE SET description = EXCLUDED.description, system_prompt = EXCLUDED.system_prompt
+  ON CONFLICT (name, kind) DO UPDATE SET description = EXCLUDED.description, system_prompt = EXCLUDED.system_prompt, model_config = EXCLUDED.model_config
   RETURNING id
 )
 INSERT INTO case_participants (case_id, persona_id, seat)
