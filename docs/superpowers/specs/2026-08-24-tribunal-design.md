@@ -1,7 +1,7 @@
 # The Tribunal — Design Spec
 
 **Date:** 2026-08-24
-**Status:** Approved for planning
+**Status:** Historical — superseded by [`/specs.md`](../../../specs.md), which describes the app as built. This document is the original design and predates the two-panel-judge restructure, the in-app model switcher, response banking, and the response length limits.
 
 ## Purpose
 
